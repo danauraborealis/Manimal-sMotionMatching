@@ -5,8 +5,7 @@
     <ModName>MotionMatching</ModName>
     <ModGuid>com.manimal.motionmatching</ModGuid>
     <ModDisplayName>$(ModAuthor)-$(ModName)</ModDisplayName>
-    <!-- Set only when a real source repository exists. -->
-    <ModRepositoryUrl></ModRepositoryUrl>
+    <ModRepositoryUrl>https://github.com/danauraborealis/Manimal-sMotionMatching</ModRepositoryUrl>
     <Version>$(ModVersion)</Version>
     <AssemblyVersion>$(ModVersion).0</AssemblyVersion>
     <FileVersion>$(ModVersion).0</FileVersion>

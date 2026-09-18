@@ -1,6 +1,6 @@
 # MotionMatching player test build
 
-This is a private test build of Manimal-MotionMatching 0.1.1. It is not an official or publication-compliant release; the project has no public source repository configured yet.
+This is a player test build of Manimal-MotionMatching 0.1.1. Source code is available at [Manimal-sMotionMatching](https://github.com/danauraborealis/Manimal-sMotionMatching). This package has not undergone a complete publication-guideline audit.
 
 This build targets solo SPT 4.1.5. Fika raids are unsupported for this test. Install UnityToolkit separately; the build was checked against the installed UnityToolkit 2.0.2.0 baseline.
 

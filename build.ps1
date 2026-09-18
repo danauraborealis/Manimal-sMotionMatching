@@ -146,6 +146,11 @@ try {
     $values = @($metadata[0].ConstructorArguments | ForEach-Object { [string]$_.Value })
     if ($values[0] -ne $guid -or $values[1] -ne $displayName -or $values[2] -ne $version) { throw 'Compiled plugin identity mismatch.' }
     if ($compiled.Name.Version.ToString() -ne "$version.0") { throw 'Assembly version mismatch.' }
+    $modInfo = $compiled.MainModule.GetType('Manimal.MotionMatching.ModInfo')
+    $compiledRepository = @($modInfo.Fields | Where-Object { $_.Name -eq 'RepositoryUrl' })
+    if ($compiledRepository.Count -ne 1 -or [string]$compiledRepository[0].Constant -cne [string]$identity.Project.PropertyGroup.ModRepositoryUrl) {
+        throw 'Compiled source repository URL mismatch.'
+    }
     $toolkit = @($plugin[0].CustomAttributes | Where-Object { $_.AttributeType.FullName -eq 'BepInEx.BepInDependency' -and $_.ConstructorArguments[0].Value -eq 'com.arys.unitytoolkit' })
     if ($toolkit.Count -ne 1) { throw 'UnityToolkit dependency missing.' }
     $directPatches = @($compiled.MainModule.GetMemberReferences() | Where-Object { $_.DeclaringType.FullName -eq 'HarmonyLib.Harmony' -and $_.Name -match '^Patch' })
@@ -200,14 +205,14 @@ $repositoryUrl = [string]$identity.Project.PropertyGroup.ModRepositoryUrl
 $manifest = [PSCustomObject]@{
     package = $displayName
     version = $version
-    purpose = 'private-player-test-build'
+    purpose = 'player-test-build'
     publicationCompliant = $false
     sourceRepositoryUrl = if ([string]::IsNullOrWhiteSpace($repositoryUrl)) { $null } else { $repositoryUrl }
     archive = [PSCustomObject]@{ file = [IO.Path]::GetFileName($archivePath); sha256 = $archiveHash }
     files = $manifestFiles
 }
 $manifest | ConvertTo-Json -Depth 10 | Set-Content -LiteralPath $manifestPath -Encoding utf8
-Write-Output "Verified private player-test package and runtime databases ($($mainPoseDatabase.Clips) main clips, $($reactionPoseDatabase.Clips) reaction clips): $archivePath"
+Write-Output "Verified player-test package and runtime databases ($($mainPoseDatabase.Clips) main clips, $($reactionPoseDatabase.Clips) reaction clips): $archivePath"
 Write-Output "SHA-256 manifest (outside install archive): $manifestPath"
 if ([string]::IsNullOrWhiteSpace($repositoryUrl)) {
     Write-Output 'Private development build: source repository metadata is not configured; this is not publication compliant.'
