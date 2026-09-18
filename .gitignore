@@ -1,0 +1,21 @@
+bin/
+obj/
+artifacts/
+tmp/
+*.user
+*.suo
+__pycache__/
+
+# Personal agent configuration and local test settings
+/.claude/
+/.codex/
+/tools/Ask-Codex.ps1
+/tools/test-area.json
+
+# Local development history and exploratory research (kept on disk)
+/LOCOMOTION_PLAN.md
+/docs/implementation_log.md
+/docs/research_*.md
+/docs/movement_analysis_report.md
+/docs/movement_analysis_review.md
+/docs/movement_tables.md

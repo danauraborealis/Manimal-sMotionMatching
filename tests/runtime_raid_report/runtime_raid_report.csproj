@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.cs" />
+    <Compile Include="..\..\src\MotionMatching\RaidReportRecorder.cs" Link="RaidReportRecorder.cs" />
+    <Reference Include="Newtonsoft.Json" HintPath="$(SptRoot)\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll" />
+    <Reference Include="ZLinq" HintPath="$(SptRoot)\BepInEx\plugins\UnityToolkit\ZLinq.dll" />
+  </ItemGroup>
+</Project>

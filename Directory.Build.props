@@ -1,0 +1,18 @@
+<Project>
+  <PropertyGroup>
+    <ModVersion>0.1.1</ModVersion>
+    <ModAuthor>Manimal</ModAuthor>
+    <ModName>MotionMatching</ModName>
+    <ModGuid>com.manimal.motionmatching</ModGuid>
+    <ModDisplayName>$(ModAuthor)-$(ModName)</ModDisplayName>
+    <!-- Set only when a real source repository exists. -->
+    <ModRepositoryUrl></ModRepositoryUrl>
+    <Version>$(ModVersion)</Version>
+    <AssemblyVersion>$(ModVersion).0</AssemblyVersion>
+    <FileVersion>$(ModVersion).0</FileVersion>
+    <Authors>$(ModAuthor)</Authors>
+    <Product>$(ModDisplayName)</Product>
+    <RepositoryUrl>$(ModRepositoryUrl)</RepositoryUrl>
+    <SptRoot Condition="'$(SptRoot)' == ''">D:\SPT41Dev</SptRoot>
+  </PropertyGroup>
+</Project>
