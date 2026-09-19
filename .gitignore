@@ -5,6 +5,7 @@ tmp/
 *.user
 *.suo
 __pycache__/
+/.dotnet-home/
 
 # Personal agent configuration and local test settings
 /.claude/

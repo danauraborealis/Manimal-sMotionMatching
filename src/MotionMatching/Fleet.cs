@@ -52,6 +52,7 @@ namespace Manimal.MotionMatching
         public bool HasPreviousReplay;
         public CheapPoseProbe PreviousCheap;
         public bool HasPreviousCheap;
+        public float LastVisibleAt;
     }
 
     internal struct CheapPoseProbe
@@ -105,6 +106,15 @@ namespace Manimal.MotionMatching
         private readonly RaidReportRecorder _report;
         private readonly bool _automatic;
         private readonly Dictionary<int, int> _anonymousIds = new Dictionary<int, int>();
+        private sealed class CulledReaction
+        {
+            public Player Player;
+            public HitReactionPolicy Policy;
+        }
+        private readonly Dictionary<int, CulledReaction> _culledReactions = new Dictionary<int, CulledReaction>();
+        private readonly List<int> _activationRemovals = new List<int>();
+        private float _nextActivationScan;
+        private float _nextActivationReport;
         private int _nextAnonymousId;
         private readonly StringBuilder _line = new StringBuilder(1024);
         private readonly Stopwatch _clock = new Stopwatch();
@@ -211,6 +221,7 @@ namespace Manimal.MotionMatching
                 _frameMs = 0; _framesTimed = 0; _peakMs = 0;
             }
             if (world == null) return;
+            if (_automatic) UpdateAutomaticActivation(world, now);
             if (now >= _nextScan) FollowBots(world, now);
             _gone.Clear();
             foreach (var kv in _rigs)
@@ -257,6 +268,11 @@ namespace Manimal.MotionMatching
             }
             foreach (int id in _gone)
                 Detach(id, "dead or inactive");
+            if (_automatic)
+            {
+                UpdateDetailedBots(world.MainPlayer, now);
+                return;
+            }
             if (now < _nextScan)
             {
                 if (_automatic) UpdateDetailedBots(world.MainPlayer, now);
@@ -275,6 +291,56 @@ namespace Manimal.MotionMatching
                 Attach(p);
             }
             if (_automatic) UpdateDetailedBots(world.MainPlayer, now);
+        }
+
+        private void UpdateAutomaticActivation(GameWorld world, float now)
+        {
+            if (now < _nextActivationScan) return;
+            _nextActivationScan = now + .25f;
+            Player viewer = world.MainPlayer;
+            bool viewerValid = viewer != null && viewer.HealthController != null && viewer.HealthController.IsAlive;
+            Vector3 origin = viewerValid ? viewer.Position : Vector3.zero;
+            float range = _plugin.AnimationDistanceValue;
+            bool visibility = _plugin.AnimationVisibilityValue;
+            _activationRemovals.Clear();
+            foreach (var pair in _culledReactions)
+                if (!Alive(pair.Value.Player)) _activationRemovals.Add(pair.Key);
+            foreach (int id in _activationRemovals)
+            {
+                _culledReactions.Remove(id);
+                _anonymousIds.Remove(id);
+            }
+            _activationRemovals.Clear();
+            foreach (var pair in _rigs)
+            {
+                var rig = pair.Value;
+                if (!Alive(rig.Player)) continue; // ordinary teardown below retains its death reason
+                float distance = (rig.Player.Position - origin).sqrMagnitude;
+                if (rig.Player.IsVisible || distance <= BotActivationPolicy.NearDistance * BotActivationPolicy.NearDistance)
+                    rig.LastVisibleAt = now;
+                string reason = BotActivationPolicy.IneligibleReason(true, distance, range, rig.Player.IsVisible,
+                    rig.Player.UsedSimplifiedSkeleton, viewerValid, now - rig.LastVisibleAt, visibility);
+                if (reason != null) _activationRemovals.Add(pair.Key);
+            }
+            foreach (int id in _activationRemovals) Detach(id, "performance_cull", true);
+            if (viewerValid && _rigs.Count < MaxBots)
+            {
+                var candidates = world.AllAlivePlayersList.AsValueEnumerable()
+                    .Where(p => Alive(p) && !_rigs.ContainsKey(p.GetInstanceID())
+                        && BotActivationPolicy.IneligibleReason(false, (p.Position - origin).sqrMagnitude, range,
+                            p.IsVisible, p.UsedSimplifiedSkeleton, true, 0f, visibility) == null)
+                    .OrderBy(p => (p.Position - origin).sqrMagnitude)
+                    .Take(MaxBots - _rigs.Count).ToArray();
+                foreach (var player in candidates) Attach(player);
+            }
+            if (now >= _nextActivationReport)
+            {
+                _nextActivationReport = now + 5f;
+                int alive = world.AllAlivePlayersList.AsValueEnumerable().Count(p => Alive(p));
+                _report.Event(new { t = now - _started, type = "activation_coverage", alive,
+                    active = _rigs.Count, native = Math.Max(0, alive - _rigs.Count), distance = range,
+                    cullUnseen = visibility });
+            }
         }
 
         // every live bot, bosses and prone ones included (an "every bot" experiment must not select)
@@ -667,9 +733,11 @@ namespace Manimal.MotionMatching
             {
                 anonymousId = ++_nextAnonymousId;
                 _anonymousIds[id] = anonymousId;
+                if (_automatic) _report.Count("unique_bots_activated", 1);
             }
             var rig = new BotRig { Player = p, Id = id, AnonymousId = anonymousId,
-                Role = p.Profile?.Info?.Settings?.Role.ToString(), AttachedAt = Time.realtimeSinceStartup };
+                Role = p.Profile?.Info?.Settings?.Role.ToString(), AttachedAt = Time.realtimeSinceStartup,
+                LastVisibleAt = Time.realtimeSinceStartup };
             string error = null;
             try
             {
@@ -698,7 +766,13 @@ namespace Manimal.MotionMatching
                 {
                     _plugin.ConfigurePlayback(rig.Pose);
                     rig.HasReactionDatabase = _plugin.ConfigureRaidReactions(rig.Pose, _db);
-                    if (rig.HasReactionDatabase) rig.ReactionPolicy = new HitReactionPolicy();
+                    if (rig.HasReactionDatabase)
+                    {
+                        CulledReaction retained;
+                        rig.ReactionPolicy = _culledReactions.TryGetValue(id, out retained) && ReferenceEquals(retained.Player, p)
+                            ? retained.Policy ?? new HitReactionPolicy() : new HitReactionPolicy();
+                    }
+                    _culledReactions.Remove(id);
                     SpeedRampPatch.Attach(p); BotInertiaPatch.Attach(p);
                     SprintInertia.Attach(p, () => rig.Pose != null && rig.Pose.Enabled && !rig.Failed && !rig.Suspended);
                     string placerError = null;
@@ -760,16 +834,28 @@ namespace Manimal.MotionMatching
                 + ",\"pose\":" + (rig.Pose != null ? "true" : "false") + ",\"placer\":" + (rig.Placer != null && !Control ? "true" : "false") + ",\"error\":" + Q(error) + "}");
         }
 
-        private void Detach(int id, string why)
+        private void Detach(int id, string why, bool performanceCull = false)
         {
             BotRig rig;
             if (!_rigs.TryGetValue(id, out rig)) return;
             _rigs.Remove(id);
             MovementCleanup.Detach(rig.Player);
+            if (performanceCull)
+            {
+                if (rig.ReactionPolicy != null && rig.ReactionPolicy.Pending)
+                {
+                    bool started = rig.Pose != null && rig.Pose.ReactionStarts > rig.ReactionStartsWhenRequested;
+                    rig.ReactionPolicy.Resolve(Time.time, started);
+                    _report.Count(started ? "hit_reaction_started" : "hit_reaction_rejected", 1);
+                }
+                _culledReactions[id] = new CulledReaction { Player = rig.Player, Policy = rig.ReactionPolicy };
+                _report.Count("performance_culls", 1);
+            }
+            else _culledReactions.Remove(id);
             WriteEvents(rig);
             if (_automatic)
             {
-                string reason = why == "dead or inactive" ? "dead_or_inactive" : "raid_end";
+                string reason = performanceCull ? "performance_cull" : why == "dead or inactive" ? "dead_or_inactive" : "raid_end";
                 _report.Event(new { t = Time.realtimeSinceStartup - _started, b = rig.AnonymousId, type = "bot_detached", reason,
                     appliedFrames = rig.Pose?.AppliedFrames ?? 0, hurried = rig.Pose?.HurriedFrames ?? 0,
                     reachClamps = rig.Placer?.ReachClamps ?? 0, anchorFailures = rig.Placer?.AnchorFailures ?? 0,
@@ -777,7 +863,7 @@ namespace Manimal.MotionMatching
                     damageEvents = rig.DamageEvents, reactionsAccepted = rig.ReactionPolicy?.Accepted ?? 0,
                     reactionsSuppressed = rig.ReactionPolicy?.Suppressed ?? 0 });
                 _report.Count("bots_detached", 1);
-                _anonymousIds.Remove(id);
+                if (!performanceCull) _anonymousIds.Remove(id);
                 return;
             }
             _writer.WriteLine("{\"k\":\"gone\",\"t\":" + F(Time.realtimeSinceStartup - _started) + ",\"b\":" + id + ",\"why\":" + Q(why)
@@ -805,7 +891,7 @@ namespace Manimal.MotionMatching
                     rig.NextSample = now + (velocity.x * velocity.x + velocity.z * velocity.z > 0.09f
                         ? MovingSampleSeconds : StillSampleSeconds);
                 }
-                if (sampleDue && rig.SyncProbe != null)
+                if ((_automatic ? rig.CaptureThisFrame : sampleDue) && rig.SyncProbe != null)
                 {
                     rig.NativeSync = rig.SyncProbe.Capture();
                     rig.NativeSyncFrame = Time.frameCount;
@@ -1587,6 +1673,8 @@ namespace Manimal.MotionMatching
         {
             foreach (var id in new List<int>(_rigs.Keys))
                 Detach(id, reason);
+            _culledReactions.Clear();
+            _anonymousIds.Clear();
             _writer.WriteLine("{\"k\":\"end\",\"t\":" + F(Time.realtimeSinceStartup - _started) + ",\"why\":" + Q(reason) + ",\"samples\":" + Samples + "}");
             _writer.Flush();
             _writer.Dispose();

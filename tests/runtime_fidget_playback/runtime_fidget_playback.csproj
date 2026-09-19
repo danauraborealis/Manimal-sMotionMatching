@@ -1,0 +1,50 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+  </PropertyGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\revolver\fidget.weapon.json" LogicalName="Manimal.MotionMatching.Data.revolver.fidget.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\revolver\fidget2.weapon.json" LogicalName="Manimal.MotionMatching.Data.revolver.fidget2.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\revolver\fidget3.weapon.json" LogicalName="Manimal.MotionMatching.Data.revolver.fidget3.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\sniper\fidget1.weapon.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget1.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\sniper\fidget1.gesture.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget1.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\sniper\fidget2.weapon.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget2.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\sniper\fidget2.gesture.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget2.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\sniper\fidget3.weapon.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget3.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\sniper\fidget3.gesture.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget3.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\tau\fidget 1.weapon.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 1.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\tau\fidget 1.gesture.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 1.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\tau\fidget 2.weapon.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 2.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\tau\fidget 2.gesture.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 2.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\tau\fidget 3.weapon.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 3.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\tau\fidget 3.gesture.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 3.gesture.json" />
+    <Compile Include="Program.cs" />
+    <Compile Include="Stubs.cs" />
+    <Compile Include="..\..\src\MotionMatching\FidgetPlayback.cs" Link="FidgetPlayback.cs" />
+    <Compile Include="..\..\src\MotionMatching\FidgetPool.cs" Link="FidgetPool.cs" />
+    <Compile Include="..\..\src\MotionMatching\FidgetSchedule.cs" Link="FidgetSchedule.cs" />
+    <Compile Include="..\..\src\MotionMatching\FidgetClip.cs" Link="FidgetClip.cs" />
+    <Compile Include="..\..\src\MotionMatching\FidgetGestureClip.cs" Link="FidgetGestureClip.cs" />
+    <Compile Include="..\..\src\MotionMatching\FidgetPivot.cs" Link="FidgetPivot.cs" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\fidget1.weapon.json" LogicalName="Manimal.MotionMatching.Data.fidget1.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\fidget2.weapon.json" LogicalName="Manimal.MotionMatching.Data.fidget2.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\fidget3.weapon.json" LogicalName="Manimal.MotionMatching.Data.fidget3.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\fidget1.gesture.json" LogicalName="Manimal.MotionMatching.Data.fidget1.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\fidget2.gesture.json" LogicalName="Manimal.MotionMatching.Data.fidget2.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\fidget3.gesture.json" LogicalName="Manimal.MotionMatching.Data.fidget3.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\mp5\fidget.weapon.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\mp5\fidget2.weapon.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget2.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\mp5\fidget3.weapon.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget3.weapon.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\mp5\fidget.gesture.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\mp5\fidget2.gesture.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget2.gesture.json" />
+    <EmbeddedResource Include="..\..\src\MotionMatching\Data\mp5\fidget3.gesture.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget3.gesture.json" />
+    <Reference Include="Newtonsoft.Json" HintPath="$(SptRoot)\EscapeFromTarkov_Data\Managed\Newtonsoft.Json.dll" />
+    <Reference Include="ZLinq" HintPath="$(SptRoot)\BepInEx\plugins\UnityToolkit\ZLinq.dll" />
+  </ItemGroup>
+</Project>
+
+

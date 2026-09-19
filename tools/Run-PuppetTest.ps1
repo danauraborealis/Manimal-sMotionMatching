@@ -50,6 +50,15 @@ if ($ManualGallery) {
     if (!$PoseClip) { $PoseClip = 'startstop' }
 }
 $repoRoot = Split-Path $PSScriptRoot -Parent
+$identityPath = Join-Path $repoRoot 'Directory.Build.props'
+if (!(Test-Path -LiteralPath $identityPath -PathType Leaf)) { throw "Mod identity file not found: $identityPath" }
+[xml]$identity = Get-Content -LiteralPath $identityPath -Raw
+$identityGroup = @($identity.Project.PropertyGroup) | Select-Object -First 1
+$modAuthor = [string]$identityGroup.ModAuthor
+$modName = [string]$identityGroup.ModName
+$modDisplayName = $modAuthor + '-' + $modName
+$modAssemblyName = $modAuthor + '.' + $modName + '.dll'
+if ([string]::IsNullOrWhiteSpace($modAuthor) -or [string]::IsNullOrWhiteSpace($modName)) { throw 'Directory.Build.props is missing the mod identity.' }
 . (Join-Path $PSScriptRoot 'SptAiBridge.ps1')
 Connect-SptAiBridge -GameRoot $GameRoot
 $script:MotionMatchingTestApiHandle = $null
@@ -138,8 +147,12 @@ function Invoke-PlacementArtifacts([string]$Mode, [string]$CapturePath, [string]
 $state = Get-ProcessState
 if (!$state.Client) {
     if (!$Launch) { throw 'Client is not running. Re-run with -Launch to start server and client through the bridge.' }
-    $built = Join-Path $repoRoot 'src\MotionMatching\bin\Release\netstandard2.1\Manimal.MotionMatching.dll'
-    $installed = Join-Path $GameRoot 'BepInEx\plugins\Manimal-MotionMatching\Manimal.MotionMatching.dll'
+    $built = Join-Path $repoRoot ('src\MotionMatching\bin\Release\netstandard2.1\' + $modAssemblyName)
+    $installed = Join-Path $GameRoot ('BepInEx\plugins\' + $modDisplayName + '\' + $modAssemblyName)
+    $legacyInstalled = Join-Path $GameRoot 'BepInEx\plugins\Manimal-MotionMatching\Manimal.MotionMatching.dll'
+    if (Test-Path -LiteralPath $legacyInstalled -PathType Leaf) {
+        throw "Legacy Manimal-MotionMatching is still installed at $legacyInstalled. Run tools\\Install-MotionMagic.ps1 before launching a puppet test."
+    }
     if ($ReactionDatabase) {
         New-Item -ItemType Directory -Force -Path (Split-Path $installed) | Out-Null
         Copy-Item -LiteralPath $ReactionDatabase -Destination (Join-Path (Split-Path $installed) 'reaction_posedb.json') -Force

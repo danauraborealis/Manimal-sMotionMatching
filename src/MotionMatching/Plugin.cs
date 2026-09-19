@@ -12,6 +12,7 @@ namespace Manimal.MotionMatching
 {
     [BepInPlugin(ModInfo.Guid, ModInfo.Name, ModInfo.Version)]
     [BepInDependency("com.arys.unitytoolkit")]
+    [BepInIncompatibility(Plugin.LegacyModGuid)]
     public sealed partial class Plugin : BaseUnityPlugin
     {
         internal static Plugin Instance { get; private set; }
@@ -71,6 +72,7 @@ namespace Manimal.MotionMatching
         private void Awake()
         {
             Instance = this;
+            MigrateLegacySettings();
             BindRaidSettings();
             _enabled = Config.Bind("General", "Enabled", true, "Master switch. Disabling releases the bot and saves any capture.");
             _overlay = Config.Bind("General", "Overlay", false, "Show test status and foot/path markers.");
@@ -124,6 +126,7 @@ namespace Manimal.MotionMatching
             _runBandLegs = Config.Bind("Pose playback", "Run band legs", 1, new ConfigDescription("Legs for forward movement: 0 brisk walk (heavy walk loop sped up), 1 Tarkov walk (default; with refinement, also used while accelerating and at walking speeds), 2 Alyx run and sprint loops. Strafes retain their directional selection.", new AcceptableValueRange<int>(0, 2)));
             _repickStart = Config.Bind("Pose playback", "Re-pick start direction", true, "Allow one clip correction when a start fires while the body is still turning.");
             _inertialize = Config.Bind("Pose playback", "Inertialize transitions", true, "Decay the pose difference at every switch instead of cross-fading between two poses (no snap).");
+            InitializeFidgets();
             try
             {
                 _patches.Enable();
@@ -146,6 +149,7 @@ namespace Manimal.MotionMatching
 
         private void Update()
         {
+            TickFidgets();
             try
             {
                 PollSave();
@@ -787,9 +791,11 @@ namespace Manimal.MotionMatching
 
         private void Report(string text) { _status = text; Logger.LogInfo(text); }
 
-        private void OnDisable() { if (_fleet != null) StopFleet("Plugin disabled"); End("Plugin disabled"); }
+        private void OnDisable() { StopFidget(); if (_fleet != null) StopFleet("Plugin disabled"); End("Plugin disabled"); }
         private void OnDestroy()
         {
+            StopFidget();
+            _fidgetPatches.Disable();
             if (_fleet != null) StopFleet("Plugin unloaded");
             End("Plugin unloaded");
             _patches.Disable();

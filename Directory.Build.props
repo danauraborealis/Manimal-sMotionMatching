@@ -1,9 +1,9 @@
 <Project>
   <PropertyGroup>
-    <ModVersion>0.1.1</ModVersion>
+    <ModVersion>0.1.2</ModVersion>
     <ModAuthor>Manimal</ModAuthor>
-    <ModName>MotionMatching</ModName>
-    <ModGuid>com.manimal.motionmatching</ModGuid>
+    <ModName>MotionMagic</ModName>
+    <ModGuid>com.manimal.motionmagic</ModGuid>
     <ModDisplayName>$(ModAuthor)-$(ModName)</ModDisplayName>
     <ModRepositoryUrl>https://github.com/danauraborealis/Manimal-sMotionMatching</ModRepositoryUrl>
     <Version>$(ModVersion)</Version>

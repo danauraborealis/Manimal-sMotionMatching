@@ -146,7 +146,23 @@ try {
     $values = @($metadata[0].ConstructorArguments | ForEach-Object { [string]$_.Value })
     if ($values[0] -ne $guid -or $values[1] -ne $displayName -or $values[2] -ne $version) { throw 'Compiled plugin identity mismatch.' }
     if ($compiled.Name.Version.ToString() -ne "$version.0") { throw 'Assembly version mismatch.' }
+    foreach ($action in @('fidget1', 'fidget2', 'fidget3', 'mp5.fidget', 'mp5.fidget2', 'mp5.fidget3',
+        'sniper.fidget1', 'sniper.fidget2', 'sniper.fidget3', 'tau.fidget 1', 'tau.fidget 2', 'tau.fidget 3')) {
+        foreach ($layer in @('weapon', 'gesture')) {
+            $resourceName = "Manimal.MotionMatching.Data.$action.$layer.json"
+            $resource = @($compiled.MainModule.Resources | Where-Object { $_.Name -ceq $resourceName })
+            if ($resource.Count -ne 1) { throw "Embedded resource is missing or duplicated: $resourceName" }
+        }
+    }
     $modInfo = $compiled.MainModule.GetType('Manimal.MotionMatching.ModInfo')
+    foreach ($action in @('fidget', 'fidget2', 'fidget3')) {
+        $resourceName = "Manimal.MotionMatching.Data.revolver.$action.weapon.json"
+        $resource = @($compiled.MainModule.Resources | Where-Object { $_.Name -ceq $resourceName })
+        if ($resource.Count -ne 1) { throw "Embedded revolver resource is missing or duplicated: $resourceName" }
+    }
+    if (@($compiled.MainModule.Resources | Where-Object { $_.Name -like 'Manimal.MotionMatching.Data.revolver.*.gesture.json' }).Count -ne 0) {
+        throw 'Revolver fidgets must contain weapon transforms only.'
+    }
     $compiledRepository = @($modInfo.Fields | Where-Object { $_.Name -eq 'RepositoryUrl' })
     if ($compiledRepository.Count -ne 1 -or [string]$compiledRepository[0].Constant -cne [string]$identity.Project.PropertyGroup.ModRepositoryUrl) {
         throw 'Compiled source repository URL mismatch.'

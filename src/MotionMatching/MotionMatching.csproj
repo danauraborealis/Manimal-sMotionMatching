@@ -10,6 +10,33 @@
     <ToolkitPath>$(SptRoot)\BepInEx\plugins\UnityToolkit</ToolkitPath>
   </PropertyGroup>
   <ItemGroup>
+    <EmbeddedResource Include="Data\revolver\fidget.weapon.json" LogicalName="Manimal.MotionMatching.Data.revolver.fidget.weapon.json" />
+    <EmbeddedResource Include="Data\revolver\fidget2.weapon.json" LogicalName="Manimal.MotionMatching.Data.revolver.fidget2.weapon.json" />
+    <EmbeddedResource Include="Data\revolver\fidget3.weapon.json" LogicalName="Manimal.MotionMatching.Data.revolver.fidget3.weapon.json" />
+    <EmbeddedResource Include="Data\sniper\fidget1.weapon.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget1.weapon.json" />
+    <EmbeddedResource Include="Data\sniper\fidget1.gesture.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget1.gesture.json" />
+    <EmbeddedResource Include="Data\sniper\fidget2.weapon.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget2.weapon.json" />
+    <EmbeddedResource Include="Data\sniper\fidget2.gesture.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget2.gesture.json" />
+    <EmbeddedResource Include="Data\sniper\fidget3.weapon.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget3.weapon.json" />
+    <EmbeddedResource Include="Data\sniper\fidget3.gesture.json" LogicalName="Manimal.MotionMatching.Data.sniper.fidget3.gesture.json" />
+    <EmbeddedResource Include="Data\tau\fidget 1.weapon.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 1.weapon.json" />
+    <EmbeddedResource Include="Data\tau\fidget 1.gesture.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 1.gesture.json" />
+    <EmbeddedResource Include="Data\tau\fidget 2.weapon.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 2.weapon.json" />
+    <EmbeddedResource Include="Data\tau\fidget 2.gesture.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 2.gesture.json" />
+    <EmbeddedResource Include="Data\tau\fidget 3.weapon.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 3.weapon.json" />
+    <EmbeddedResource Include="Data\tau\fidget 3.gesture.json" LogicalName="Manimal.MotionMatching.Data.tau.fidget 3.gesture.json" />
+    <EmbeddedResource Include="Data\mp5\fidget.weapon.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget.weapon.json" />
+    <EmbeddedResource Include="Data\mp5\fidget.gesture.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget.gesture.json" />
+    <EmbeddedResource Include="Data\mp5\fidget2.weapon.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget2.weapon.json" />
+    <EmbeddedResource Include="Data\mp5\fidget2.gesture.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget2.gesture.json" />
+    <EmbeddedResource Include="Data\mp5\fidget3.weapon.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget3.weapon.json" />
+    <EmbeddedResource Include="Data\mp5\fidget3.gesture.json" LogicalName="Manimal.MotionMatching.Data.mp5.fidget3.gesture.json" />
+    <EmbeddedResource Include="Data\fidget1.weapon.json" LogicalName="Manimal.MotionMatching.Data.fidget1.weapon.json" />
+    <EmbeddedResource Include="Data\fidget1.gesture.json" LogicalName="Manimal.MotionMatching.Data.fidget1.gesture.json" />
+    <EmbeddedResource Include="Data\fidget3.weapon.json" LogicalName="Manimal.MotionMatching.Data.fidget3.weapon.json" />
+    <EmbeddedResource Include="Data\fidget3.gesture.json" LogicalName="Manimal.MotionMatching.Data.fidget3.gesture.json" />
+    <EmbeddedResource Include="Data\fidget2.weapon.json" LogicalName="Manimal.MotionMatching.Data.fidget2.weapon.json" />
+    <EmbeddedResource Include="Data\fidget2.gesture.json" LogicalName="Manimal.MotionMatching.Data.fidget2.gesture.json" />
     <Reference Include="$(ManagedPath)\UnityEngine*.dll" Private="false" />
     <Reference Include="Assembly-CSharp" HintPath="$(ManagedPath)\Assembly-CSharp.dll" Private="false" />
     <Reference Include="Comfort" HintPath="$(ManagedPath)\Comfort.dll" Private="false" />
@@ -30,6 +57,12 @@
       <ModInfoLines Include="public const string RepositoryUrl = &quot;$(ModRepositoryUrl)&quot;%3B }}" />
     </ItemGroup>
     <WriteLinesToFile File="$(IntermediateOutputPath)ModInfo.g.cs" Lines="@(ModInfoLines)" Overwrite="true" WriteOnlyWhenDifferent="true" />
-    <ItemGroup><Compile Include="$(IntermediateOutputPath)ModInfo.g.cs" /></ItemGroup>
+    <ItemGroup>
+<Compile Include="$(IntermediateOutputPath)ModInfo.g.cs" /></ItemGroup>
   </Target>
 </Project>
+
+
+
+
+

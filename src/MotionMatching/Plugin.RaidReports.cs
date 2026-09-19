@@ -12,6 +12,10 @@ namespace Manimal.MotionMatching
     public sealed partial class Plugin
     {
         private ConfigEntry<bool> _automaticRaids, _developerControls;
+        private ConfigEntry<float> _animationDistance;
+        private ConfigEntry<bool> _animationVisibility;
+        internal float AnimationDistanceValue => _animationDistance.Value;
+        internal bool AnimationVisibilityValue => _animationVisibility.Value;
         internal ConfigEntry<bool> _raidReactions;
         private RaidReportRecorder _raidRecorder;
         private bool _raidAttempted;
@@ -32,6 +36,11 @@ namespace Manimal.MotionMatching
                 "Enable damage reactions and subdued moving-jump landing recovery for normal bots.");
             _developerControls = Config.Bind("Player test", "Developer hotkeys", false,
                 "Enable the optional capture/puppet keyboard shortcuts. Keep disabled for normal play.");
+            _animationDistance = Config.Bind("Performance", "Animation distance", 80f,
+                new ConfigDescription("Maximum distance in metres to activate normal-raid animation. Active bots get a 15 m exit margin. Bots outside range use native Tarkov animation.",
+                    new AcceptableValueRange<float>(20f, 300f)));
+            _animationVisibility = Config.Bind("Performance", "Cull unseen bots", true,
+                "Outside 20 m, use Tarkov's visibility flag to limit normal-raid animation. Allow 2 seconds before deactivating an unseen bot. This is not a separate line-of-sight raycast.");
         }
 
         private void TickRaidReports()
@@ -70,6 +79,7 @@ namespace Manimal.MotionMatching
                 plugins = BepInEx.Bootstrap.Chainloader.PluginInfos.Values.AsValueEnumerable()
                     .Select(p => new { guid = p.Metadata.GUID, version = p.Metadata.Version.ToString() }).ToArray(),
                 settings = new { clip = _poseClip.Value, footPlacer = _footPlacerConfig.Value,
+                    animationDistance = _animationDistance.Value, cullUnseenBots = _animationVisibility.Value,
                     footLock = _footLockConfig.Value, lean = _bodyLeanConfig.Value,
                     leanStrength = _bodyLeanStrength.Value, weaponLevel = _bodyLeanWeaponLevel.Value,
                     hipShift = _hipShift.Value, pelvisTilt = _pelvisTilt.Value,
